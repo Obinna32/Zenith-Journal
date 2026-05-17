@@ -1,0 +1,31 @@
+{% extends "entries/base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md border border-gray-qoo">
+    <h2 class="text-2xl font-bold mb-6 text-center text-indigo-600">Login to Zenith</h2>
+
+    <form method = "POST">
+        {% csrf_token %}
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Username</label>
+                <input type="text" name="username" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700">
+                Login
+            </button>
+
+        </div>
+    </form>
+</div>
+
+{% endblock content %}
+
+
+

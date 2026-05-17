@@ -9,14 +9,25 @@
     <body class="bg-gray-50 text-gray-900">
 
         <nav class="bg-white border-b border-gray-200 py-4 shadow-sm">
-            <div class="container mx-auto px-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-indigo-600">Zenith Journal</h1>
-                <div class="space-x-4">
-                    <a href="#" class="text-gray-600 hover:text-indigo-600">Calendar</a>
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-600">Zenith Journal</h1>
+            <div class="space-x-4 flex items-center">
+                {% if user.is_authenticated %}
+                    <span class="text-sm text-gray-500 italic">Hello, {{ user.username }}</span>
+                    <a href="{% url 'entry-list' %}" class="text-gray-600 hover:text-indigo-600">My Journal</a>
+
+                    <form action="{% url 'logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="text-red-500 text-sm hover:underline">Logout</button>
+                    </form>
+                
                     <a href="{% url 'entry-create' %}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">+ New Entry</a>
-                </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-indigo-600 font-bold">Login</a>
+                {% endif %}
             </div>
-        </nav>
+        </div>
+    </nav>
         
         <main class="container mx-auto px-4 py-8">
             {% block content %}
