@@ -1,6 +1,8 @@
+import calendar
+from datetime import date, datetime, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from .models import Entry
 from .forms import EntryForm
@@ -24,3 +26,33 @@ class EntryCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+    
+class CalendarView(LoginRequiredMixin, TemplateView):
+    template_name = 'entries/calendar.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        today = date.today()
+        month = int(self.request.GET.get('month', today.month))
+        year = int(self.request.GET.get('year', today.year))        
+
+        cal = calendar.Calendar(firstweekday=6) # Start on Sunday
+        month_days = cal.monthdatescalendar(year, month)
+        
+        user_entries = Entry.objects.filter(
+            user=self.request.user, 
+            date_created__year=year, 
+            date_created__month=month
+        ).values_list('date_created', flat=True)
+
+        first_day_of_month = date(year, month, 1)
+        prev_month = first_day_of_month - timedelta(days=1)
+        next_month = first_day_of_month + timedelta(days=32)
+
+        context['month_days'] = month_days
+        context['current_month'] = first_day_of_month
+        context['prev_month'] = prev_month
+        context['next_month'] = next_month
+        context['user_entry_dates'] = user_entries
+        return context

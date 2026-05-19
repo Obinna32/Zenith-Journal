@@ -15,6 +15,7 @@
                 {% if user.is_authenticated %}
                     <span class="text-sm text-gray-500 italic">Hello, {{ user.username }}</span>
                     <a href="{% url 'entry-list' %}" class="text-gray-600 hover:text-indigo-600">My Journal</a>
+                    <a href="{% url 'calendar' %}" class="text-gray-600 hover:text-indigo-600">Calendar</a>
 
                     <form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
