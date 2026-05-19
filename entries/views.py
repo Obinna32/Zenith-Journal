@@ -6,6 +6,9 @@ from django.views.generic import ListView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from .models import Entry
 from .forms import EntryForm
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 # Create your views here.
 class EntryListView(LoginRequiredMixin, ListView):
@@ -56,3 +59,21 @@ class CalendarView(LoginRequiredMixin, TemplateView):
         context['next_month'] = next_month
         context['user_entry_dates'] = user_entries
         return context
+
+def export_journal_pdf(request):
+    entries = Entry.objects.filter(user=request.user).order_by('-date_created')
+
+    template_path = 'entries/pdf_export.html'
+    context = {'entries':entries, 'user':request.user}
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="my_journal.pdf'
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse("We had some errors <pre>" + html+ '</pre>')
+    return response
