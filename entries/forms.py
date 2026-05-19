@@ -10,6 +10,5 @@ class EntryForm(forms.ModelForm):
             'date_created': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border rounded-lg'}),
             'title': forms.TextInput(attrs={'class': 'w-full p-2 border rounded-lg', 'placeholder': 'Title of your day...'}),
             'mood': forms.Select(attrs={'class': 'w-full p-2 border rounded-lg'}),
-            'content': forms.Textarea(attrs={'class': 'w-full p-2 border rounded-lg', 'rows':5}),
             'habits_completed': forms.CheckboxSelectMultiple(),
         }

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django_ckeditor_5.fields import CKEditor5Field
 
 # Create your models here.
 
@@ -19,7 +20,7 @@ class Entry(models.Model):
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
-    content = models.TextField()
+    content = CKEditor5Field('Text', config_name='default')
     date_created = models.DateField()
     mood = models.CharField(max_length=20, choices=MOOD_CHOICES, default='neutral')
 

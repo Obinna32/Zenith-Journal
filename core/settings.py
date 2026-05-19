@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "entries",
+    "django_ckeditor_5",
 ]
 
 MIDDLEWARE = [
@@ -119,3 +120,18 @@ STATIC_URL = "static/"
 
 LOGIN_REDIRECT_URL = "entry-list"
 LOGOUT_REDIRECT_URL = 'login'
+
+CKEDITOR_5_CONFIGS ={
+    'default': {
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'undo', 'redo'],
+    }
+}
+
+import os
+
+# Media files (Uploaded files like images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# This is a specific requirement for the CKEditor 5 package
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
