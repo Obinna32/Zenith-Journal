@@ -9,6 +9,9 @@ from .forms import EntryForm
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
+import openai
+from django.utils import timezone
+import os
 
 # Create your views here.
 class EntryListView(LoginRequiredMixin, ListView):
@@ -17,9 +20,13 @@ class EntryListView(LoginRequiredMixin, ListView):
     context_object_name = "entries"
     ordering = ['date_created']
 
-    def get_queryset(self):
-        return Entry.objects.filter(user=self.request.user).order_by('-date_created')
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['ai_summary'] = get_ai_summary(self.request.user)
+        except Exception:
+            context['ai_summary'] = "AI Reflection currently unavailable."
+        return context
 class EntryCreateView(LoginRequiredMixin, CreateView):
     model = Entry
     form_class = EntryForm
@@ -77,3 +84,26 @@ def export_journal_pdf(request):
     if pisa_status.err:
         return HttpResponse("We had some errors <pre>" + html+ '</pre>')
     return response
+
+def get_ai_summary(user):
+    last_week = timezone.now() - timedelta(days=7)
+    entries = Entry.objects.filter(user=user, date_created__gte=last_week)
+
+    if entries.count() < 3:
+        return "Write at least 3 entries this week to get an AI Insights"
+    
+    combined_text = ""
+    for entry in entries:
+        combined_text += f"Date: {entry.date_created} - Mood: {entry.mood}\nContent: {entry.content}\n\n"
+
+    client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful life coach. Analyze the following journal entries and provide a 3-sentence summary of the user's week and one piece of encouragement."},
+            {"role": "user", "content": combined_text}
+        ]
+    )
+    return response.choices[0].message.content
+
